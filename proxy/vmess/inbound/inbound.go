@@ -28,6 +28,8 @@ import (
 	"v2ray.com/core/proxy/vmess"
 	"v2ray.com/core/proxy/vmess/encoding"
 	"v2ray.com/core/transport/internet"
+	"regexp"
+	"fmt"
 )
 
 type userByEmail struct {
@@ -270,7 +272,13 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 		panic("no inbound metadata")
 	}
 	inbound.User = request.User
+	user := request.User.Account.(*vmess.MemoryAccount)
+	addr := request.Address.String()
+	match, _ := regexp.MatchString("facebook|blued|twitter|pornhub", addr)
+	if match {
+		fmt.Printf(fmt.Sprintf("request user is %s,addr is %s \n", user.ID, request.Address.String()))
 
+	}
 	sessionPolicy = h.policyManager.ForLevel(request.User.Level)
 
 	ctx, cancel := context.WithCancel(ctx)
